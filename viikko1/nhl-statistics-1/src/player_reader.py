@@ -2,8 +2,8 @@ from urllib import request
 from player import Player
 
 class PlayerReader:
-    def __init__(self):
-        self._url = "https://nhlstatisticsforohtu.herokuapp.com/players.txt"
+    def __init__(self, _url):
+        self._url = _url #"https://nhlstatisticsforohtu.herokuapp.com/players.txt"
 
     def get_players(self):
         players_file = request.urlopen(self._url)
