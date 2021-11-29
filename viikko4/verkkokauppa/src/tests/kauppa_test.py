@@ -233,3 +233,39 @@ class TestKauppa(unittest.TestCase):
         kauppa.tilimaksu("pekka", "12345")
 
         pankki_mock.tilisiirto.assert_called_with("pekka", 42, "12345", "1111", 0)
+
+    
+    def test_poisto_korista_toimii(self):
+        pankki_mock = Mock()
+        viitegeneraattori_mock = Mock()
+
+        # palautetaan aina arvo 42
+        viitegeneraattori_mock.uusi.return_value = 42
+
+        varasto_mock = Mock()
+
+        # alustetaan kauppa
+        kauppa = Kauppa(varasto_mock, pankki_mock, viitegeneraattori_mock)
+        kauppa._kaupan_tili = "1111"
+
+                # tehdään toteutus saldo-metodille
+        def varasto_saldo(tuote_id):
+            if tuote_id == 1:
+                return 10
+
+        # tehdään toteutus hae_tuote-metodille
+        def varasto_hae_tuote(tuote_id):
+            if tuote_id == 1:
+                return Tuote(1, "maito", 5)
+
+        # otetaan toteutukset käyttöön
+        varasto_mock.saldo.side_effect = varasto_saldo
+        varasto_mock.hae_tuote.side_effect = varasto_hae_tuote
+
+        kauppa.aloita_asiointi()
+        kauppa.lisaa_koriin(1)
+        kauppa.aloita_asiointi()
+        kauppa.tilimaksu("pekka", "12345")
+
+        varasto_mock.ota_varastosta.assert_called()
+
